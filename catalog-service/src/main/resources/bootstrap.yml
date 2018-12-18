@@ -1,0 +1,9 @@
+server:
+  port: 8181
+
+spring:
+  application:
+    name: catalogservice
+  cloud:
+    config:
+      uri: http://localhost:8888
