@@ -1,9 +1,14 @@
 server:
   port: 8181
 
+
 spring:
-  application:
-    name: catalogservice
   cloud:
     config:
       uri: http://localhost:8888
+    vault:
+      host: localhost
+      port: 9200
+      scheme: http
+      authentication: token
+      token: s.GnrguzmyhVHSJZFn9QTGtoy8

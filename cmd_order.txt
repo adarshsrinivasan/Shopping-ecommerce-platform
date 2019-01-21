@@ -1,0 +1,7 @@
+docker-compose up rabbitmq
+docker-compose up mysqldb
+docker-compose up consul
+docker-compose up vault
+/vault_and_consul/init.sh or /vault_and_consul/unseal.sh
+vault login and load secrets "vault write secret/catalog-service @/mnt/vault/data/catalog-service-credentials.json"
+
