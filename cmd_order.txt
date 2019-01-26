@@ -3,5 +3,8 @@ docker-compose up mysqldb
 docker-compose up consul
 docker-compose up vault
 /vault_and_consul/init.sh or /vault_and_consul/unseal.sh
-vault login and load secrets "vault write secret/catalog-service @/mnt/vault/data/catalog-service-credentials.json"
+vault login and load secrets 
+	"vault write secret/catalog-service @/mnt/vault/data/catalog-service-credentials.json
+	 vault write secret/config-server @/mnt/vault/data/config-server-credentials.json
+	 vault write secret/inventory-service @/mnt/vault/data/inventory-service-credentials.json"
 

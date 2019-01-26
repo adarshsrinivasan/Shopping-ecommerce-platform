@@ -17,4 +17,11 @@ public class Product {
     private String name;
     private String description;
     private double price;
+
+    @Transient
+    private boolean inStock =true;
+
+    public void setInStock(boolean inStock) {
+        this.inStock = inStock;
+    }
 }
