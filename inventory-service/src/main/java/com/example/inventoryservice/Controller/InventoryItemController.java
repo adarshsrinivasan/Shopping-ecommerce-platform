@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -25,6 +26,11 @@ public class InventoryItemController {
     @Autowired
     public InventoryItemController (InventoryItemService inventoryItemService){
         this.inventoryItemService = inventoryItemService;
+    }
+
+    @GetMapping
+    public List<InventoryItem> findAllInventoryItems(){
+        return inventoryItemService.findAllInventoryItems();
     }
 
     @GetMapping("/{productCode}")

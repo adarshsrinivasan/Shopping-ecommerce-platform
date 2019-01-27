@@ -24,4 +24,12 @@ public class Product {
     public void setInStock(boolean inStock) {
         this.inStock = inStock;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }

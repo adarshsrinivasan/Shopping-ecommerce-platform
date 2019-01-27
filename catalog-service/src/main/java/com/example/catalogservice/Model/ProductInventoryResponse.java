@@ -1,11 +1,11 @@
-package com.example.catalogservice.Service;
+package com.example.catalogservice.Model;
 
 import lombok.Data;
 
 @Data
 public class ProductInventoryResponse {
     private String productCode;
-    private int availableQuantity;
+    private int availableQuantity = 0;
 
     public String getProductCode() {
         return productCode;

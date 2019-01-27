@@ -7,4 +7,14 @@ vault login and load secrets
 	"vault write secret/catalog-service @/mnt/vault/data/catalog-service-credentials.json
 	 vault write secret/config-server @/mnt/vault/data/config-server-credentials.json
 	 vault write secret/inventory-service @/mnt/vault/data/inventory-service-credentials.json"
+service-registry
+config-server
+edge-server
+inventory-service
+catalog-service
+
+
+
+feign : http://nphumbert.github.io/blog/2017/07/23/setup-a-circuit-breaker-with-hystrix/
+vault and consul : http://pcarion.com/2017/04/30/A-consul-a-vault-and-a-docker-walk-into-a-bar..html
 
