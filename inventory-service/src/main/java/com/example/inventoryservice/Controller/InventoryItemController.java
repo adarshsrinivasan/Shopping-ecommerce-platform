@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RefreshScope
-@RequestMapping("/api/inventory")
+@RequestMapping("/inventory")
 @Slf4j
 public class InventoryItemController {
 

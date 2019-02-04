@@ -35,7 +35,7 @@ public class InventoryServiceClient {
     public ResponseEntity<ProductInventoryResponse> getInventoryByProductCode(String productCode){
         LOGGER.info("Contacting inventory-service to get inventory of : {}", productCode);
         ResponseEntity<ProductInventoryResponse> productInventoryResponseResponseEntity =
-                    restTemplate.getForEntity("http://inventory-service/api/inventory/{productCode}", ProductInventoryResponse.class, productCode);
+                    restTemplate.getForEntity("http://inventory-service/inventory/{productCode}", ProductInventoryResponse.class, productCode);
         if(productInventoryResponseResponseEntity.getStatusCode() == HttpStatus.OK){
             LOGGER.debug("Received response from inventory-service for inventory of : {}", productCode);
         }

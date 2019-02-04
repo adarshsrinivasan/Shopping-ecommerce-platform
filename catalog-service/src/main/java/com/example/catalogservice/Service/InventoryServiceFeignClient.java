@@ -17,9 +17,9 @@ import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 @FeignClient(name = "inventory-service", fallback = InventoryServiceFeignClientFallback.class)
 public interface InventoryServiceFeignClient {
 
-    @GetMapping("/api/inventory")
+    @GetMapping("/inventory")
     List<ProductInventoryResponse> getInventoryLevels();
 
-    @GetMapping("/api/inventory/{productCode}")
+    @GetMapping("/inventory/{productCode}")
     ResponseEntity<ProductInventoryResponse> getInventoryByProductCode(@PathVariable String productCode);
 }

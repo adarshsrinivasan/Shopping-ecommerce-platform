@@ -1,4 +1,4 @@
-package com.example.vendorservice.Model;
+package com.example.inventoryservice.Model;
 
 import lombok.Data;
 

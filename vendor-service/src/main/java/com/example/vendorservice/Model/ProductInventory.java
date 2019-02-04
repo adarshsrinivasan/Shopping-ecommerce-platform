@@ -23,11 +23,4 @@ public class ProductInventory {
         this.availableQuantity = availableQuantity;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-                "productCode='" + productCode + '\'' +
-                ", availableQuantity=" + availableQuantity +
-                '}';
-    }
 }

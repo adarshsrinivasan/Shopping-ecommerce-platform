@@ -1,8 +1,8 @@
 
-DELETE FROM inventory;
+DELETE FROM vendors;
 
-insert into inventory(id, product_code, quantity) VALUES
-(1, 'P001', 250),
-(2, 'P002', 132),
-(3, 'P003', 0)
+insert into vendors(vendor_id, vendor_name, location) VALUES
+('V001', 'Vendor-1', 60),
+('V002', 'Vendor-2', 40),
+('V003', 'Vendor-3', 30)
 ;

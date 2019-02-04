@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RefreshScope
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @Slf4j
 public class ProductController {
 
