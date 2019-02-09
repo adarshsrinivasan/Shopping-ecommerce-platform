@@ -1,6 +1,7 @@
 package com.example.inventoryservice.Configuration;
 
-import common.Model.KafkaMessageModel;
+import com.example.inventoryservice.Service.InventoryItemService;
+import common.KafkaMessageModel.VendorMessageModel;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -27,7 +28,7 @@ public class KafkaConsumerConfig {
     @Autowired
     private KafkaProperties kafkaProperties;
 
-    @Value("${inventory.topic-name}")
+    @Value("${vendor-inventory.topic-name}")
     private String topicName;
 
     @Value("${spring.kafka.consumergroup-id}")
@@ -35,6 +36,8 @@ public class KafkaConsumerConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
+    @Autowired
+    private InventoryItemService inventoryItemService;
     @Bean
     public Map<String, Object> consumerConfig() {
         Map<String, Object> properties = new HashMap<>(kafkaProperties.buildConsumerProperties());
@@ -47,15 +50,15 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, KafkaMessageModel> consumerFactory() {
-        final JsonDeserializer<KafkaMessageModel> jsonDeserializer = new JsonDeserializer<>();
+    public ConsumerFactory<String, Object> consumerFactory() {
+        final JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>();
         jsonDeserializer.addTrustedPackages("*");
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, KafkaMessageModel> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, KafkaMessageModel> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
 
@@ -63,9 +66,10 @@ public class KafkaConsumerConfig {
     }
 
     @KafkaListener(topics = "product-inventory-update", containerFactory = "kafkaListenerContainerFactory")
-    public void productConsumerListener(ConsumerRecord<String, KafkaMessageModel> consumerRecord, @Payload KafkaMessageModel kafkaMessageModel){
+    public void productConsumerListener(ConsumerRecord<String, VendorMessageModel> consumerRecord, @Payload VendorMessageModel vendorMessageModel){
 
-        LOGGER.info("Received Message, VendorId : " + kafkaMessageModel.getVendorId());
+        LOGGER.info("Received Message, VendorId : " + vendorMessageModel.getVendorId());
+        inventoryItemService.notifyAddOrUpdateProduct(vendorMessageModel.getProductInventories());
     }
 
 }

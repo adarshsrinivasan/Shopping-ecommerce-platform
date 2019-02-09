@@ -1,7 +1,6 @@
 package com.example.catalogservice.Service;
 
-import com.example.catalogservice.Model.ProductInventoryResponse;
-import com.example.catalogservice.Model.ProductInventoryResponseList;
+import com.example.catalogservice.Model.ProductInventory;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,10 +27,10 @@ public class InventoryServiceClient {
             @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
             @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "60")
     })
-    public ResponseEntity<ProductInventoryResponse> getInventoryByProductCode(String productCode){
+    public ResponseEntity<ProductInventory> getInventoryByProductCode(String productCode){
         LOGGER.info("Contacting inventory-service to get inventory of : {}", productCode);
-        ResponseEntity<ProductInventoryResponse> productInventoryResponseResponseEntity =
-                    restTemplate.getForEntity("http://inventory-service/inventory/{productCode}", ProductInventoryResponse.class, productCode);
+        ResponseEntity<ProductInventory> productInventoryResponseResponseEntity =
+                    restTemplate.getForEntity("http://inventory-service/inventory/{productCode}", ProductInventory.class, productCode);
         if(productInventoryResponseResponseEntity.getStatusCode() == HttpStatus.OK){
             LOGGER.debug("Received response from inventory-service for inventory of : {}", productCode);
         }
@@ -47,14 +42,14 @@ public class InventoryServiceClient {
     }
 
     @SuppressWarnings("unused")
-    public ResponseEntity<ProductInventoryResponse> getDefaultProductInventoryByCode(String productCode){
+    public ResponseEntity<ProductInventory> getDefaultProductInventoryByCode(String productCode){
         LOGGER.info("Falling back to getDefaultProductInventoryByCode for product code : [{}], returning default value 50", productCode);
 
-        ProductInventoryResponse productInventoryResponse = new ProductInventoryResponse();
-        productInventoryResponse.setProductCode(productCode);
-        productInventoryResponse.setAvailableQuantity(50);
+        ProductInventory productInventory = new ProductInventory();
+        productInventory.setProductCode(productCode);
+        productInventory.setAvailableQuantity(50);
 
-        return new ResponseEntity<ProductInventoryResponse>(productInventoryResponse, HttpStatus.OK);
+        return new ResponseEntity<ProductInventory>(productInventory, HttpStatus.OK);
     }
 
 }

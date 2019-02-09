@@ -1,6 +1,6 @@
 package com.example.catalogservice.Service;
 
-import com.example.catalogservice.Model.ProductInventoryResponse;
+import com.example.catalogservice.Model.ProductInventory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,29 +16,29 @@ public class InventoryServiceFeignClientFallback implements InventoryServiceFeig
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceFeignClientFallback.class);
     @Override
-    public List<ProductInventoryResponse> getInventoryLevels() {
+    public List<ProductInventory> getInventoryLevels() {
         LOGGER.info("Falling back getInventoryLevels returning default product code \"P001\" and quantity = 50");
 
-        List<ProductInventoryResponse> productInventoryResponses = new ArrayList<>();
+        List<ProductInventory> productInventories = new ArrayList<>();
 
-        ProductInventoryResponse productInventoryResponse = new ProductInventoryResponse();
-        productInventoryResponse.setProductCode("P001");
-        productInventoryResponse.setAvailableQuantity(50);
+        ProductInventory productInventory = new ProductInventory();
+        productInventory.setProductCode("P001");
+        productInventory.setAvailableQuantity(50);
 
-        productInventoryResponses.add(productInventoryResponse);
+        productInventories.add(productInventory);
 
-        return productInventoryResponses;
+        return productInventories;
     }
 
     @Override
-    public ResponseEntity<ProductInventoryResponse> getInventoryByProductCode(String productCode) {
+    public ResponseEntity<ProductInventory> getInventoryByProductCode(String productCode) {
         LOGGER.info("Falling back getInventoryByProductCode for product code : [{}], returning default value 50", productCode);
 
-        ProductInventoryResponse productInventoryResponse = new ProductInventoryResponse();
-        productInventoryResponse.setProductCode(productCode);
-        productInventoryResponse.setAvailableQuantity(50);
+        ProductInventory productInventory = new ProductInventory();
+        productInventory.setProductCode(productCode);
+        productInventory.setAvailableQuantity(50);
 
-        return new ResponseEntity<ProductInventoryResponse>(productInventoryResponse, HttpStatus.OK);
+        return new ResponseEntity<ProductInventory>(productInventory, HttpStatus.OK);
     }
 
 }

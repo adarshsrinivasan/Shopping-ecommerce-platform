@@ -17,4 +17,6 @@ catalog-service
 
 feign : http://nphumbert.github.io/blog/2017/07/23/setup-a-circuit-breaker-with-hystrix/
 vault and consul : http://pcarion.com/2017/04/30/A-consul-a-vault-and-a-docker-walk-into-a-bar..html
+kafka : https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
+mongo : https://www.journaldev.com/18156/spring-boot-mongodb
 

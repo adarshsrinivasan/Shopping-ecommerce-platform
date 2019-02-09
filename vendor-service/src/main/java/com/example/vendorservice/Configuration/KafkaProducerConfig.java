@@ -22,7 +22,7 @@ public class KafkaProducerConfig {
     @Autowired
     private KafkaProperties kafkaProperties;
 
-    @Value("${vendor.topic-name}")
+    @Value("${vendor-inventory.topic-name}")
     private String topicName;
 
     @Bean

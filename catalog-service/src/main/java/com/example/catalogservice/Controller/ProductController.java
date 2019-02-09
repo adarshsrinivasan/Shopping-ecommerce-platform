@@ -3,13 +3,11 @@ package com.example.catalogservice.Controller;
 import com.example.catalogservice.Exception.ProductNotFoundException;
 import com.example.catalogservice.Model.Product;
 import com.example.catalogservice.Service.ProductService;
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +32,15 @@ public class ProductController {
     @GetMapping("/{code}")
     public Product getByCode(@PathVariable String code){
         return productService.findByCode(code).orElseThrow(() -> new ProductNotFoundException("Product with [" + code + "] not found"));
+    }
+
+    @DeleteMapping("/{code}")
+    public DeleteResult deleteByCode(@PathVariable String code){
+        return productService.deleteProductByCode(code);
+    }
+
+    @GetMapping("/init")
+    public void initilizeMongo(){
+        productService.initMongoData();
     }
 }

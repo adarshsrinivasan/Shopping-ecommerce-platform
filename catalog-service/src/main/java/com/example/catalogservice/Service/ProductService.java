@@ -1,12 +1,16 @@
 package com.example.catalogservice.Service;
 
+
+import com.example.catalogservice.Model.ProductInventory;
 import com.example.catalogservice.Model.Product;
-import com.example.catalogservice.Model.ProductInventoryResponse;
-import com.example.catalogservice.Repository.ProductRepository;
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,16 +27,16 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class ProductService {
-    private final ProductRepository productRepository;
+    private final MongoTemplate mongoTemplate;
     private final InventoryServiceFeignClient inventoryServiceFeignClient;
     private final RestTemplate restTemplate;
     private final InventoryServiceClient inventoryServiceClient;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
-    public ProductService(ProductRepository productRepository, InventoryServiceFeignClient inventoryServiceFeignClient,
+    public ProductService(MongoTemplate mongoTemplate, InventoryServiceFeignClient inventoryServiceFeignClient,
                           RestTemplate restTemplate, InventoryServiceClient inventoryServiceClient){
-        this.productRepository = productRepository;
+        this.mongoTemplate = mongoTemplate;
         this.inventoryServiceFeignClient = inventoryServiceFeignClient;
         this.restTemplate = restTemplate;
         this.inventoryServiceClient = inventoryServiceClient;
@@ -40,7 +44,7 @@ public class ProductService {
 
     public List<Product> findAllProduct(){
 
-        List<Product> products =  productRepository.findAll();
+        List<Product> products =  mongoTemplate.findAll(Product.class);
         Map<String, Integer> productInventory = getInventoryLevel();
         List<Product> availableProducts = products.stream()
                 .filter(p -> productInventory.get(p.getCode()) != null && productInventory.get(p.getCode()) > 0)
@@ -50,11 +54,11 @@ public class ProductService {
 
     private Map<String, Integer> getInventoryLevel(){
         LOGGER.debug("Contacting inventory-service to get all inventory");
-        List<ProductInventoryResponse> productInventoryResponses = inventoryServiceFeignClient.getInventoryLevels();
+        List<ProductInventory> productInventories = inventoryServiceFeignClient.getInventoryLevels();
         LOGGER.debug("Received response from inventory-service to get all inventory");
         Map<String, Integer> inventoryLevel = new HashMap<>();
 
-        for (ProductInventoryResponse pir : productInventoryResponses){
+        for (ProductInventory pir : productInventories){
             inventoryLevel.put(pir.getProductCode(), pir.getAvailableQuantity());
         }
 
@@ -62,15 +66,28 @@ public class ProductService {
     }
 
     public Optional<Product> findByCode(String code){
-        Optional<Product> optionalProduct = productRepository.findByCode(code);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("code").is(code));
+
+        Product resultProduct = mongoTemplate.findOne(query, Product.class);
+        Optional<Product> optionalProduct;
+        if (resultProduct != null){
+            optionalProduct = Optional.of(resultProduct);
+        }
+        else {
+            optionalProduct = Optional.empty();
+        }
 
         if(optionalProduct.isPresent()){
             LOGGER.info("Fetching inventory level for product_code: "+code);
-            ResponseEntity<ProductInventoryResponse> productInventoryResponseResponseEntity = inventoryServiceClient.getInventoryByProductCode(code);
+            ResponseEntity<ProductInventory> productInventoryResponseResponseEntity = inventoryServiceClient.getInventoryByProductCode(code);
             if(productInventoryResponseResponseEntity.getStatusCode() == HttpStatus.OK){
                 int quantity = productInventoryResponseResponseEntity.getBody().getAvailableQuantity();
+                double price = productInventoryResponseResponseEntity.getBody().getPrice();
                 LOGGER.info("Available quantity: "+quantity);
-                optionalProduct.get().setInStock(quantity > 0);
+                optionalProduct.get().setStock(quantity);
+                optionalProduct.get().setPrice(price);
+
             }else {
                 LOGGER.error("Unable to get inventory level for product_code: "+code +", StatusCode: "+productInventoryResponseResponseEntity.getStatusCode());
             }
@@ -78,4 +95,55 @@ public class ProductService {
         return optionalProduct;
     }
 
+    public void addProduct(Product product){
+        mongoTemplate.save(product);
+        LOGGER.info("Added data in MongoDB code = {}", product.getCode());
+    }
+
+    public void updatePriceByCode(String code, double price){
+        Optional<Product> optionalProduct = findByCode(code);
+
+        if (optionalProduct.isPresent()){
+            Product product = optionalProduct.get();
+            product.setPrice(price);
+            addProduct(product);
+        }
+        else {
+            LOGGER.error("Unable to update price, reason : Invalid productCode");
+        }
+    }
+
+    public DeleteResult deleteProductByCode(String code){
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where("code").is(code));
+
+        return mongoTemplate.remove(query, Product.class);
+    }
+
+    public void initMongoData() {
+        LOGGER.info("Initiliazing data in MongoDB");
+        Product product1 = new Product();
+        Product product2 = new Product();
+        Product product3 = new Product();
+
+        product1.setCode("P001");
+        product1.setName("Product 1");
+        product1.setDescription("Product 1 description");
+        product1.setPrice(25);
+        addProduct(product1);
+
+        product2.setCode("P002");
+        product2.setName("Product 2");
+        product2.setDescription("Product 2 description");
+        product2.setPrice(32);
+        addProduct(product2);
+
+        product3.setCode("P003");
+        product3.setName("Product 3");
+        product3.setDescription("Product 3 description");
+        product3.setPrice(50);
+        addProduct(product3);
+
+    }
 }

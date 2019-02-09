@@ -1,35 +1,65 @@
 package com.example.catalogservice.Model;
 
-import lombok.Data;
+
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 
-@Data
-@Entity
-@Table(name = "products")
+@Document
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @Column(nullable = false, unique = true)
+    private String id;
     private String code;
-    @Column(nullable = false)
     private String name;
     private String description;
     private double price;
+    private Integer stock = 0;
 
-    @Transient
-    private boolean inStock =true;
-
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
+    public String getId() {
+        return id;
     }
 
-    public Long getId() {
-        return id;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }
