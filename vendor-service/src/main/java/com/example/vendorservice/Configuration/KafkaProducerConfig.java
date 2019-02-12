@@ -22,8 +22,11 @@ public class KafkaProducerConfig {
     @Autowired
     private KafkaProperties kafkaProperties;
 
-    @Value("${vendor-inventory.topic-name}")
-    private String topicName;
+    @Value("${vendor-inventory-updateInventory.topic-name}")
+    private String updateInventorytopicName;
+
+    @Value("${vendor-inventory-vendorRemoved.topic-name}")
+    private String vendorRemovedtopicName;
 
     @Bean
     public Map<String, Object> producerConfig(){
@@ -46,7 +49,12 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public NewTopic advanceTopic(){
-        return new NewTopic(topicName, 3, (short) 1);
+    public NewTopic advanceUpdateInventoryTopic(){
+        return new NewTopic(updateInventorytopicName, 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic advanceVendorRemovedTopic(){
+        return new NewTopic(vendorRemovedtopicName, 3, (short) 1);
     }
 }

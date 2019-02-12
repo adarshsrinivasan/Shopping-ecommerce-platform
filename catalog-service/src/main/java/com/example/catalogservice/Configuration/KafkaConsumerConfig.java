@@ -1,6 +1,6 @@
 package com.example.catalogservice.Configuration;
 
-import com.example.catalogservice.Model.ProductInventory;
+import com.example.catalogservice.Service.ProductService;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import common.KafkaMessageModel.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -35,6 +34,9 @@ public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.consumergroup-id}")
     private String groupId;
+
+    @Autowired
+    private ProductService productService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
@@ -67,9 +69,7 @@ public class KafkaConsumerConfig {
 
     @KafkaListener(topics = "product-catalog-update", containerFactory = "kafkaListenerContainerFactory")
     public void productConsumerListener(ConsumerRecord<String, InventoryMessageModel> consumerRecord, @Payload InventoryMessageModel inventoryMessageModel){
-
-        List<ProductInventory> productInventories = inventoryMessageModel.getProductInventories();
-       LOGGER.info("Received Message, ProductName : " + productInventories.get(0).getName());
+        productService.addOrUpdateProduct(inventoryMessageModel.getProduct());
     }
 
 }

@@ -95,23 +95,17 @@ public class ProductService {
         return optionalProduct;
     }
 
-    public void addProduct(Product product){
+    public void addOrUpdateProduct(Product product){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("code").is(product.getCode()));
+        Product resultProduct = mongoTemplate.findOne(query, Product.class);
+        if(resultProduct != null) {
+            product.setId(resultProduct.getId());
+        }
         mongoTemplate.save(product);
         LOGGER.info("Added data in MongoDB code = {}", product.getCode());
     }
 
-    public void updatePriceByCode(String code, double price){
-        Optional<Product> optionalProduct = findByCode(code);
-
-        if (optionalProduct.isPresent()){
-            Product product = optionalProduct.get();
-            product.setPrice(price);
-            addProduct(product);
-        }
-        else {
-            LOGGER.error("Unable to update price, reason : Invalid productCode");
-        }
-    }
 
     public DeleteResult deleteProductByCode(String code){
         Query query = new Query();
@@ -131,19 +125,19 @@ public class ProductService {
         product1.setName("Product 1");
         product1.setDescription("Product 1 description");
         product1.setPrice(25);
-        addProduct(product1);
+        addOrUpdateProduct(product1);
 
         product2.setCode("P002");
         product2.setName("Product 2");
         product2.setDescription("Product 2 description");
         product2.setPrice(32);
-        addProduct(product2);
+        addOrUpdateProduct(product2);
 
         product3.setCode("P003");
         product3.setName("Product 3");
         product3.setDescription("Product 3 description");
         product3.setPrice(50);
-        addProduct(product3);
+        addOrUpdateProduct(product3);
 
     }
 }

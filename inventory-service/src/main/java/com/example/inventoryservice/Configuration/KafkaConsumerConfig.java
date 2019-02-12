@@ -28,8 +28,11 @@ public class KafkaConsumerConfig {
     @Autowired
     private KafkaProperties kafkaProperties;
 
-    @Value("${vendor-inventory.topic-name}")
-    private String topicName;
+    @Value("${vendor-inventory-updateInventory.topic-name}")
+    private String updateInventorytopicName;
+
+    @Value("${vendor-inventory-vendorRemoved.topic-name}")
+    private String vendorRemovedtopicName;
 
     @Value("${spring.kafka.consumergroup-id}")
     private String groupId;
@@ -65,11 +68,20 @@ public class KafkaConsumerConfig {
         return factory;
     }
 
-    @KafkaListener(topics = "product-inventory-update", containerFactory = "kafkaListenerContainerFactory")
-    public void productConsumerListener(ConsumerRecord<String, VendorMessageModel> consumerRecord, @Payload VendorMessageModel vendorMessageModel){
+    @KafkaListener(topics = "vendor-inventory-updateInventory", containerFactory = "kafkaListenerContainerFactory")
+    public void productUpdateInventoryListener(ConsumerRecord<String, VendorMessageModel> consumerRecord, @Payload VendorMessageModel vendorMessageModel){
 
         LOGGER.info("Received Message, VendorId : " + vendorMessageModel.getVendorId());
-        inventoryItemService.notifyAddOrUpdateProduct(vendorMessageModel.getProductInventories());
+
+        inventoryItemService.addOrUpdateInventoryByVendor(vendorMessageModel.getVendorId(), vendorMessageModel.getProductInventories());
+    }
+
+    @KafkaListener(topics = "vendor-inventory-vendorRemoved", containerFactory = "kafkaListenerContainerFactory")
+    public void productVendorRemovedListener(ConsumerRecord<String, VendorMessageModel> consumerRecord, @Payload VendorMessageModel vendorMessageModel){
+
+        LOGGER.info("Received Message, VendorId : " + vendorMessageModel.getVendorId());
+
+        inventoryItemService.handleVendorRemoved(vendorMessageModel);
     }
 
 }

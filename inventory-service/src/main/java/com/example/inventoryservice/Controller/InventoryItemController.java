@@ -51,7 +51,7 @@ public class InventoryItemController {
 
     @PutMapping
     public Optional<InventoryItem> updatedInventory(@RequestBody InventoryItem inventoryItem){
-        Optional<InventoryItem> optionalInventoryItem = inventoryItemService.undateInventory(inventoryItem);
+        Optional<InventoryItem> optionalInventoryItem = inventoryItemService.updateInventory(inventoryItem);
         optionalInventoryItem.orElseThrow(() -> new ProductNotFoundException("No product was found with given product Id"));
         return optionalInventoryItem;
     }
@@ -59,10 +59,5 @@ public class InventoryItemController {
     @DeleteMapping("/{productCode}")
     public DeleteResult deleteInventoryByProductCode(@PathVariable String productCode){
         return inventoryItemService.deleteInventoryByProductCode(productCode);
-    }
-
-    @GetMapping("/init")
-    public void initilizeMongo(){
-        inventoryItemService.initMongoData();
     }
 }

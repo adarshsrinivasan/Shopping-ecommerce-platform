@@ -19,6 +19,9 @@ public class VendorMessageModel {
     @JsonProperty("ProductInventory")
     private List<ProductInventory> productInventories;
 
+    public VendorMessageModel() {
+    }
+
     public VendorMessageModel(String vendorId, List<ProductInventory> productInventories) {
         this.vendorId = vendorId;
         this.productInventories = productInventories;

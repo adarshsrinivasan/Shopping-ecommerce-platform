@@ -1,26 +1,22 @@
 package com.example.inventoryservice.Model;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 
-@Data
-@Entity
-@Table(name = "inventory")
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
 @Document
 public class InventoryItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-
-    @Column(name = "product_code", nullable = false, unique = true)
     private String productCode;
-
-    @Column(name = "quantity")
+    private Map<String, ProductInventory> vendorsProducts = new HashMap<>();
     private Integer availableQuantity = 0;
-
-    @Column(name = "price")
     private Double price;
 
     public String getId() {
@@ -53,5 +49,22 @@ public class InventoryItem {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public void addVendor(String vendorId, ProductInventory productInventory){
+        ProductInventory productInventory1 = vendorsProducts.get(vendorId);
+        if(productInventory1 != null && availableQuantity != 0){
+            availableQuantity -= productInventory1.getAvailableQuantity();
+        }
+        vendorsProducts.put(vendorId, productInventory);
+        availableQuantity += productInventory.getAvailableQuantity();
+    }
+
+    public void removeVendor(String vendorId){
+        ProductInventory productInventory = vendorsProducts.get(vendorId);
+        if(productInventory != null){
+            availableQuantity -= productInventory.getAvailableQuantity();
+            vendorsProducts.remove(vendorId);
+        }
     }
 }

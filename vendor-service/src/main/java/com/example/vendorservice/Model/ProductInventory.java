@@ -2,7 +2,10 @@ package com.example.vendorservice.Model;
 
 import lombok.Data;
 
-@Data
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class ProductInventory {
     private String productCode;
     private String name;

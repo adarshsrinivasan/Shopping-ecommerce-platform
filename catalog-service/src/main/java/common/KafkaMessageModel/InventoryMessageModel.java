@@ -1,6 +1,6 @@
 package common.KafkaMessageModel;
 
-import com.example.catalogservice.Model.ProductInventory;
+import com.example.catalogservice.Model.Product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -8,25 +8,25 @@ import java.util.List;
 
 
 @JsonPropertyOrder({
-        "ProductInventory"
+        "Product"
 })
 public class InventoryMessageModel {
 
-    @JsonProperty("ProductInventory")
-    private List<ProductInventory> productInventories;
+    @JsonProperty("Product")
+    private Product product;
 
     public InventoryMessageModel() {
     }
 
-    public InventoryMessageModel(List<ProductInventory> productInventories) {
-        this.productInventories = productInventories;
+    public InventoryMessageModel(Product product) {
+        this.product = product;
     }
 
-    public List<ProductInventory> getProductInventories() {
-        return productInventories;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductInventories(List<ProductInventory> productInventories) {
-        this.productInventories = productInventories;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

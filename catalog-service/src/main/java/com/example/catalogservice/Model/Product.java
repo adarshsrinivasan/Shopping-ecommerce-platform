@@ -1,9 +1,9 @@
 package com.example.catalogservice.Model;
 
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 
 @Document
 public class Product {
