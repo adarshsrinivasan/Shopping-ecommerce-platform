@@ -4,15 +4,18 @@ package com.example.catalogservice.Service;
 import com.example.catalogservice.Model.ProductInventory;
 import com.example.catalogservice.Model.Product;
 import com.mongodb.client.result.DeleteResult;
+import common.KafkaMessageModel.CartMessageModel;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,17 +32,21 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final MongoTemplate mongoTemplate;
     private final InventoryServiceFeignClient inventoryServiceFeignClient;
-    private final RestTemplate restTemplate;
-    private final InventoryServiceClient inventoryServiceClient;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
+    private KafkaTemplate<String, Object> kafkaTemplate;
+    private CartServiceFeignClient cartServiceFeignClient;
+
+
+    @Value("${catalog-cart.topic-name}")
+    private String topicName;
 
     @Autowired
     public ProductService(MongoTemplate mongoTemplate, InventoryServiceFeignClient inventoryServiceFeignClient,
-                          RestTemplate restTemplate, InventoryServiceClient inventoryServiceClient){
+                          KafkaTemplate<String, Object> kafkaTemplate, CartServiceFeignClient cartServiceFeignClient){
         this.mongoTemplate = mongoTemplate;
         this.inventoryServiceFeignClient = inventoryServiceFeignClient;
-        this.restTemplate = restTemplate;
-        this.inventoryServiceClient = inventoryServiceClient;
+        this.kafkaTemplate = kafkaTemplate;
+        this.cartServiceFeignClient = cartServiceFeignClient;
     }
 
     public List<Product> findAllProduct(){
@@ -80,7 +87,7 @@ public class ProductService {
 
         if(optionalProduct.isPresent()){
             LOGGER.info("Fetching inventory level for product_code: "+code);
-            ResponseEntity<ProductInventory> productInventoryResponseResponseEntity = inventoryServiceClient.getInventoryByProductCode(code);
+            ResponseEntity<ProductInventory> productInventoryResponseResponseEntity = inventoryServiceFeignClient.getInventoryByProductCode(code);
             if(productInventoryResponseResponseEntity.getStatusCode() == HttpStatus.OK){
                 int quantity = productInventoryResponseResponseEntity.getBody().getAvailableQuantity();
                 double price = productInventoryResponseResponseEntity.getBody().getPrice();
@@ -89,7 +96,8 @@ public class ProductService {
                 optionalProduct.get().setPrice(price);
 
             }else {
-                LOGGER.error("Unable to get inventory level for product_code: "+code +", StatusCode: "+productInventoryResponseResponseEntity.getStatusCode());
+                LOGGER.error("Unable to get inventory level for product_code: "+code +", StatusCode: "
+                        +productInventoryResponseResponseEntity.getStatusCode());
             }
         }
         return optionalProduct;
@@ -140,4 +148,14 @@ public class ProductService {
         addOrUpdateProduct(product3);
 
     }
+
+    public void addToCart(CartMessageModel cartMessageModel) {
+        LOGGER.info("Adding new Cart items to kafka");
+        kafkaTemplate.send(topicName, cartMessageModel);
+    }
+
+    public Cart getUserCart(String userId){
+        return cartServiceFeignClient.getUserCart(userId);
+    }
+
 }
