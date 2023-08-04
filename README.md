@@ -1,2 +1,1 @@
-# MicroServiceSample
-In progress...
+# Shopping Ecommerce platform
